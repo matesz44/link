@@ -1,30 +1,25 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"strings"
+	"os"
 
 	"github.com/matesz44/link"
 )
 
-var exampleHTML = `
-<html>
-<body>
-	<h1>Hello!</h1>
-	<a href="/other-page">
-		A link to another page
-		<span> Some span </span>
-	</a>
-	<a href="/second-page">A link to a second page</a>
-</body>
-</html>
-`
-
 func main() {
-	r := strings.NewReader(exampleHTML)
-	links, err := link.Parse(r)
+	HTML := flag.String("html", "index.html", "html file to parse")
+	flag.Parse()
+	file, err := os.Open(*HTML)
 	if err != nil {
 		panic(err)
 	}
+
+	links, err := link.Parse(file)
+	if err != nil {
+		panic(err)
+	}
+
 	fmt.Printf("%+v\n", links)
 }
