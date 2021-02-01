@@ -7,7 +7,7 @@ import (
 	"github.com/matesz44/link"
 )
 
-var exampleHtml = `
+var exampleHTML = `
 <html>
 <body>
 	<h1>Hello!</h1>
@@ -17,7 +17,7 @@ var exampleHtml = `
 `
 
 func main() {
-	r := strings.NewReader(exampleHtml)
+	r := strings.NewReader(exampleHTML)
 	links, err := link.Parse(r)
 	if err != nil {
 		panic(err)
