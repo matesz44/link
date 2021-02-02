@@ -63,7 +63,7 @@ func main() {
 	for _, l := range links {
 		switch {
 		case strings.HasPrefix(l.Href, "//"):
-			hrefs = append(hrefs, "https:"+l.Href)
+			hrefs = append(hrefs, baseURL.Scheme+":"+l.Href)
 		case strings.HasPrefix(l.Href, "/"):
 			hrefs = append(hrefs, base+l.Href)
 		case strings.HasPrefix(l.Href, "http"):
