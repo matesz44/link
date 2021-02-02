@@ -54,8 +54,8 @@ func main() {
 		Host:   reqURL.Host,
 	}
 	base := baseURL.String()
-	fmt.Println("Request URL: ", reqURL.String())
-	fmt.Println("Base URL:", base)
+	//fmt.Println("Request URL: ", reqURL.String())
+	//fmt.Println("Base URL:", base)
 
 	links, _ := link.Parse(resp.Body)
 
