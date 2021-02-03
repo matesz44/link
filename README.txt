@@ -26,7 +26,7 @@ Usage of /tmp/go-build486378106/b001/exe/main:
   -u string
         url you want to crawl (default "https://m4t3sz.gitlab.io/bsc/")
 
-go run examples/ex2/main.go -u https://m4t3sz.gitlab.io/bsc/ -d 3
+$ go run examples/ex2/main.go -u https://m4t3sz.gitlab.io/bsc/ -d 3
 https://m4t3sz.gitlab.io/bsc/showcase/revshellgen/img/
 https://m4t3sz.gitlab.io/bsc/showcase/revshellgen/
 https://m4t3sz.gitlab.io/bsc/writeup/ctf/2021/

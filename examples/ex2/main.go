@@ -22,10 +22,8 @@ import (
 */
 
 func main() {
-	urlFlag := flag.String("u", "https://m4t3sz.gitlab.io/bsc/", "url you want to crawl")
-	depthFlag := flag.Int("d", 5, "depth you want to follow links")
-	flag.Parse()
 
+	urlFlag, depthFlag := argp()
 	//fmt.Println(*urlFlag)
 	pages := bfs(*urlFlag, *depthFlag)
 	//fmt.Println(depthFlag)
@@ -35,7 +33,13 @@ func main() {
 	for _, page := range pages {
 		fmt.Println(page)
 	}
+}
 
+func argp() (urlFlag *string, depthFlag *int) {
+	urlFlag = flag.String("u", "https://m4t3sz.gitlab.io/bsc/", "url you want to crawl")
+	depthFlag = flag.Int("d", 3, "depth you want to follow links")
+	flag.Parse()
+	return urlFlag, depthFlag
 }
 
 // empty structs need less mem than bools
