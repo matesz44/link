@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -12,12 +13,12 @@ import (
 
 /*
 	PLAN:
-	1. GET req to url
-	2. Parse links on the page with `link`
-	3. Build absolute URL's from relative links
-	4. FFilter links to different domains
-	5. Find all the pages recursively (BFS)
-	6. Output XML
+	1. [X] GET req to url
+	2. [X] Parse links on the page with `link`
+	3. [X] Build absolute URL's from relative links
+	4. [/] Filter links to different domains
+	5. [ ] Find all the pages recursively (BFS)
+	6. [ ] Output XML
 */
 
 func main() {
@@ -25,14 +26,39 @@ func main() {
 	flag.Parse()
 
 	//fmt.Println(*urlFlag)
+	pages := get(*urlFlag)
 
-	resp, err := http.Get(*urlFlag)
+	for _, page := range pages {
+		fmt.Println(page)
+	}
+
+}
+
+func get(urlStr string) []string {
+	resp, err := http.Get(urlStr)
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
-
 	//	io.Copy(os.Stdout, resp.Body)
+
+	// If we pass http:// it usually redirects
+	// to https:// so we need the URL after this
+	// redirect
+	reqURL := resp.Request.URL
+	//fmt.Println(reqURL.String())
+	baseURL := &url.URL{
+		Scheme: reqURL.Scheme,
+		Host:   reqURL.Host,
+	}
+	//fmt.Println("Request URL: ", reqURL.String())
+	//fmt.Println("Base URL:", baseURL.String())
+	return hrefs(resp.Body, baseURL)
+}
+
+func hrefs(r io.Reader, baseURL *url.URL) []string {
+	base := baseURL.String()
+	links, _ := link.Parse(r)
 
 	/*
 		Possible URL's:
@@ -44,34 +70,16 @@ func main() {
 		mailto:asd@asd.asd
 	*/
 
-	// If we pass http:// it usually redirects
-	// to https:// so we need the URL after this
-	// redirect
-	reqURL := resp.Request.URL
-	//fmt.Println(reqURL.String())
-	baseURL := &url.URL{
-		Scheme: reqURL.Scheme,
-		Host:   reqURL.Host,
-	}
-	base := baseURL.String()
-	//fmt.Println("Request URL: ", reqURL.String())
-	//fmt.Println("Base URL:", base)
-
-	links, _ := link.Parse(resp.Body)
-
-	var hrefs []string
+	var ret []string
 	for _, l := range links {
 		switch {
 		case strings.HasPrefix(l.Href, "//"):
-			hrefs = append(hrefs, baseURL.Scheme+":"+l.Href)
+			ret = append(ret, baseURL.Scheme+":"+l.Href)
 		case strings.HasPrefix(l.Href, "/"):
-			hrefs = append(hrefs, base+l.Href)
+			ret = append(ret, base+l.Href)
 		case strings.HasPrefix(l.Href, "http"):
-			hrefs = append(hrefs, l.Href)
+			ret = append(ret, l.Href)
 		}
 	}
-	for _, href := range hrefs {
-		fmt.Println(href)
-	}
-
+	return ret
 }
