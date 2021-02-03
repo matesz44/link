@@ -27,6 +27,7 @@ func main() {
 
 	//fmt.Println(*urlFlag)
 	pages := get(*urlFlag)
+	//filter(baseURL)
 
 	for _, page := range pages {
 		fmt.Println(page)
@@ -53,7 +54,7 @@ func get(urlStr string) []string {
 	}
 	//fmt.Println("Request URL: ", reqURL.String())
 	//fmt.Println("Base URL:", baseURL.String())
-	return hrefs(resp.Body, baseURL)
+	return filter(baseURL, hrefs(resp.Body, baseURL))
 }
 
 func hrefs(r io.Reader, baseURL *url.URL) []string {
@@ -81,5 +82,20 @@ func hrefs(r io.Reader, baseURL *url.URL) []string {
 			ret = append(ret, l.Href)
 		}
 	}
+	return ret
+}
+
+func filter(baseURL *url.URL, links []string) []string {
+	base := baseURL.String()
+	var ret []string
+	for _, link := range links {
+		// https://m4t3sz.gitlab.io/bsc --> OK
+		// https://m4t3sz.gitlab.io/bsc/writeup --> OK
+		// https://twitter.com --> NOPE
+		if strings.HasPrefix(link, base) {
+			ret = append(ret, link)
+		}
+	}
+
 	return ret
 }
