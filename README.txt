@@ -19,26 +19,47 @@ $ go run examples/ex1/main.go -html ~/dox/git/own/sites/m4t3sz.gitlab.io/writeup
 example2
 --------
 (webpage -> GET -> urls(only on provided domain) -> recursively(depth can be set))
-$ go run examples/ex2/main.go -h                                  
-Usage of /tmp/go-build486378106/b001/exe/main:
+(output can be XML (-x))
+$ go run examples/ex2/main.go -h                          
+Usage of /tmp/go-build579754148/b001/exe/main:
   -d int
-        depth you want to follow links (default 5)
+        depth you want to follow links (default 3)
   -u string
         url you want to crawl (default "https://m4t3sz.gitlab.io/bsc/")
+  -x    use this to output xml in a sitemap format
 
-$ go run examples/ex2/main.go -u https://m4t3sz.gitlab.io/bsc/ -d 3
-https://m4t3sz.gitlab.io/bsc/showcase/revshellgen/img/
-https://m4t3sz.gitlab.io/bsc/showcase/revshellgen/
-https://m4t3sz.gitlab.io/bsc/writeup/ctf/2021/
-https://m4t3sz.gitlab.io/bsc/writeup/htb/omni/
-https://m4t3sz.gitlab.io/bsc/writeup/htb/openkeys/
-https://m4t3sz.gitlab.io/bsc/writeup/htb/buff/
+$ go run examples/ex2/main.go -u https://m4t3sz.gitlab.io/bsc/ -d 2   
+https://m4t3sz.gitlab.io/bsc/showcase/
 https://m4t3sz.gitlab.io/bsc/writeup/
+https://m4t3sz.gitlab.io/bsc/showcase/revshellgen/
 https://m4t3sz.gitlab.io/bsc/writeup/ctf/
 https://m4t3sz.gitlab.io/bsc/writeup/htb/
-https://m4t3sz.gitlab.io/bsc/
-https://m4t3sz.gitlab.io/bsc/showcase/
-https://m4t3sz.gitlab.io/bsc/writeup/ctf/2020/
 https://m4t3sz.gitlab.io/bsc/writeup/thm/
-https://m4t3sz.gitlab.io/bsc/writeup/htb/sneaky_mailer/
-https://m4t3sz.gitlab.io/bsc/writeup/thm/overpass/
+https://m4t3sz.gitlab.io/bsc/
+
+output xml in a sitemap format(-x):
+$ go run examples/ex2/main.go -u https://m4t3sz.gitlab.io/bsc/ -d 2 -x
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://m4t3sz.gitlab.io/bsc/</loc>
+  </url>
+  <url>
+    <loc>https://m4t3sz.gitlab.io/bsc/showcase/</loc>
+  </url>
+  <url>
+    <loc>https://m4t3sz.gitlab.io/bsc/writeup/</loc>
+  </url>
+  <url>
+    <loc>https://m4t3sz.gitlab.io/bsc/showcase/revshellgen/</loc>
+  </url>
+  <url>
+    <loc>https://m4t3sz.gitlab.io/bsc/writeup/ctf/</loc>
+  </url>
+  <url>
+    <loc>https://m4t3sz.gitlab.io/bsc/writeup/htb/</loc>
+  </url>
+  <url>
+    <loc>https://m4t3sz.gitlab.io/bsc/writeup/thm/</loc>
+  </url>
+</urlset>
