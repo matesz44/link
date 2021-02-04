@@ -25,11 +25,7 @@ import (
 
 func main() {
 	urlFlag, depthFlag, xmlFlag := argp()
-	//fmt.Println(*urlFlag)
 	pages := bfs(*urlFlag, *depthFlag)
-	//fmt.Println(depthFlag)
-	//pages := get(*urlFlag)
-	//filter(baseURL)
 	if *xmlFlag {
 		outXML(pages)
 	} else {
@@ -79,7 +75,7 @@ func outXML(pages []string) {
 // empty structs need less mem than bools
 type empty struct{}
 
-// all of the urls
+// every url
 func bfs(urlStr string, depth int) []string {
 	// with a map you dont need to iterate
 	// over the whole thing like with a slice
@@ -119,28 +115,22 @@ func get(urlStr string) []string {
 		panic(err)
 	}
 	defer resp.Body.Close()
-	//	io.Copy(os.Stdout, resp.Body)
 
 	// If we pass http:// it usually redirects
 	// to https:// so we need the URL after this
 	// redirect
 	reqURL := resp.Request.URL
-	//fmt.Println(reqURL.String())
 	baseURL := &url.URL{
 		Scheme: reqURL.Scheme,
 		Host:   reqURL.Host,
 	}
-	//fmt.Println("Request URL: ", reqURL.String())
-	//fmt.Println("Base URL:", baseURL.String())
 	req := reqURL.String()
-	//base := baseURL.String()
 	return filter(hrefs(resp.Body, baseURL), withPrefix(req))
 }
 
 func hrefs(r io.Reader, baseURL *url.URL) []string {
 	base := baseURL.String()
 	links, _ := link.Parse(r)
-
 	/*
 		Possible URL's:
 		/some-path
@@ -150,7 +140,6 @@ func hrefs(r io.Reader, baseURL *url.URL) []string {
 		#fragment
 		mailto:asd@asd.asd
 	*/
-
 	var ret []string
 	for _, l := range links {
 		switch {
