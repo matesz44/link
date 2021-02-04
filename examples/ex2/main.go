@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/matesz44/link"
@@ -18,28 +20,60 @@ import (
 	3. [X] Build absolute URL's from relative links
 	4. [X] Filter links to different domains
 	5. [X] Find all the pages recursively (BFS)
-	6. [ ] Output XML
+	6. [X] Output XML
 */
 
 func main() {
-
-	urlFlag, depthFlag := argp()
+	urlFlag, depthFlag, xmlFlag := argp()
 	//fmt.Println(*urlFlag)
 	pages := bfs(*urlFlag, *depthFlag)
 	//fmt.Println(depthFlag)
 	//pages := get(*urlFlag)
 	//filter(baseURL)
-
-	for _, page := range pages {
-		fmt.Println(page)
+	if *xmlFlag {
+		outXML(pages)
+	} else {
+		for _, page := range pages {
+			fmt.Println(page)
+		}
 	}
 }
 
-func argp() (urlFlag *string, depthFlag *int) {
+func argp() (urlFlag *string, depthFlag *int, xmlFlag *bool) {
 	urlFlag = flag.String("u", "https://m4t3sz.gitlab.io/bsc/", "url you want to crawl")
 	depthFlag = flag.Int("d", 3, "depth you want to follow links")
+	xmlFlag = flag.Bool("x", false, "use this to output xml in a sitemap format")
 	flag.Parse()
-	return urlFlag, depthFlag
+	return urlFlag, depthFlag, xmlFlag
+}
+
+const xmlns = "https://www.sitemaps.org/schemas/sitemap/0.9"
+
+type loc struct {
+	Value string `xml:"loc"`
+}
+
+type urlset struct {
+	Urls  []loc  `xml:"url"`
+	Xmlns string `xml:"xmlns,attr"`
+}
+
+func outXML(pages []string) {
+	toXML := urlset{
+		Urls:  make([]loc, len(pages)),
+		Xmlns: xmlns,
+	}
+	for i, page := range pages {
+		toXML.Urls[i] = loc{page}
+	}
+
+	fmt.Print(xml.Header)
+	enc := xml.NewEncoder(os.Stdout)
+	enc.Indent("", "  ")
+	if err := enc.Encode(toXML); err != nil {
+		panic(err)
+	}
+	fmt.Println()
 }
 
 // empty structs need less mem than bools
@@ -56,6 +90,9 @@ func bfs(urlStr string, depth int) []string {
 	}
 	for i := 0; i <= depth; i++ {
 		q, nq = nq, make(map[string]empty)
+		if len(q) == 0 {
+			break
+		}
 		for url := range q {
 			if _, ok := seen[url]; ok {
 				continue
@@ -63,7 +100,9 @@ func bfs(urlStr string, depth int) []string {
 			seen[url] = empty{}
 
 			for _, link := range get(url) {
-				nq[link] = empty{}
+				if _, ok := seen[link]; !ok {
+					nq[link] = empty{}
+				}
 			}
 		}
 	}
@@ -136,7 +175,6 @@ func filter(links []string, keepFn func(string) bool) []string {
 			ret = append(ret, link)
 		}
 	}
-
 	return ret
 }
 
